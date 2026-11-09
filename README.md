@@ -1,8 +1,8 @@
-# CSA09 - Programming in Java | Assignment 2 (CO2)
+# CSA0907 - Programming in Java | Assignment 2 (CO2)
 
 **Student Name:** Fathi Muthu Johara M  
 **Register Number:** 192411009  
-**Course Code:** CSA0907 / CSA09  
+**Course Code:** CSA0907  
 **Java Version:** Java 25 (JavaSE-25) / JDK 21+  
 
 ---
@@ -14,7 +14,7 @@ This repository contains all experimental benchmarks, Java source implementation
 The project is organized into individual task folders:
 
 ```text
-CSA09-192411009-Assignment2/
+CSA0907-192411009-Assignment2/
 ├── README.md
 ├── Task01/
 │   ├── Task01_StringBenchmark.java
