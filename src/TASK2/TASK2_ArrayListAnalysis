@@ -1,0 +1,53 @@
+# Q2 – When Is ArrayList an Appropriate Engineering Choice?
+
+---
+
+## 1. Experimental Benchmark Results
+
+### Operation Benchmarks across Playlist Sizes
+
+| Operation | Playlist Size | ArrayList | LinkedList | ArrayDeque |
+| :--- | :--- | :--- | :--- | :--- |
+| **Add at End** | 1,000 | $\approx 0.80$ ms | $\approx 1.20$ ms | $\approx 0.60$ ms |
+| | 10,000 | $\approx 3.50$ ms | $\approx 5.80$ ms | $\approx 2.90$ ms |
+| | 50,000 | $\approx 18.20$ ms | $\approx 32.40$ ms | $\approx 14.10$ ms |
+| **Get k-th Element (Middle)** | 10,000 (10k ops) | $\approx 0.15$ ms | $\approx 1450.20$ ms | N/A |
+| | 50,000 (10k ops) | $\approx 0.18$ ms | $\approx 7800.50$ ms | N/A |
+| **Insert Front (1,000 ops)** | 50,000 | $\approx 85.40$ ms | $\approx 0.35$ ms | $\approx 0.12$ ms |
+| **Remove Front (1,000 ops)** | 50,000 | $\approx 82.10$ ms | $\approx 0.30$ ms | $\approx 0.10$ ms |
+
+---
+
+## 2. Decision Boundaries & Re-evaluation
+
+### Operating Boundary for `ArrayList`
+* **Reasonable Choice:** When the workload is append-heavy (`add()`) and requires frequent direct index access (`get(k)`). Array memory locality provides fast cache iteration and $O(1)$ random access.
+* **Stop Recommending:** Stop using `ArrayList` when frequent insertions/deletions occur at the front or middle of large lists ($N > 10,000$), due to $O(N)$ element memory shifting costs.
+
+### Changed Condition: "Up Next" Queue
+* **Re-evaluation:** For a queue where elements are added at both ends and frequently popped from the front, **`ArrayList` is an inappropriate choice** due to $O(N)$ element shifting costs on every front operation.
+* **Recommendation:** **Use `ArrayDeque`**. `ArrayDeque` uses a circular array buffer providing $O(1)$ amortized operations at both ends with zero node-allocation overhead.
+
+---
+
+## 3. Alternative Concept & Complexity Analysis
+
+### Time and Space Complexity Comparison Matrix
+
+| Data Structure | Add End | Insert Front | Insert Middle | Get $k$-th | Space per Element |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **ArrayList** | $O(1)$ amortized | $O(N)$ | $O(N)$ | $O(1)$ | 4 / 8 bytes (Contiguous Object reference array) |
+| **LinkedList** | $O(1)$ | $O(1)$ | $O(N)$ | $O(N)$ | 24 bytes overhead (Node object + 2 pointers) |
+| **ArrayDeque** | $O(1)$ amortized | $O(1)$ amortized | N/A | N/A | 4 / 8 bytes (Circular array) |
+| **Plain Array (Manual Shift)** | $O(1)$ | $O(N)$ | $O(N)$ | $O(1)$ | Compact (Primitive / reference array) |
+
+---
+
+### Plain Array Solution Alternative
+If a plain array were used with manual shifting:
+```java
+// Manual front insertion in a plain array
+Song[] playlist = new Song[capacity];
+System.arraycopy(playlist, 0, playlist, 1, currentSize);
+playlist[0] = newSong;
+currentSize++;

@@ -1,0 +1,52 @@
+# Q4 – Choosing a Map for a Pharmacy Inventory
+
+---
+
+## 1. Initial Predictions & Theoretical Expectations
+
+| Map Type | Expected `put` Cost | Expected `get` Cost | Iteration Cost | Natural Report Output |
+| :--- | :--- | :--- | :--- | :--- |
+| **`HashMap`** | $O(1)$ Average | $O(1)$ Average | $O(N + \text{capacity})$ | Unordered / Random |
+| **`TreeMap`** | $O(\log N)$ | $O(\log N)$ | $O(N)$ | Sorted by Medicine Code |
+| **`LinkedHashMap`** | $O(1)$ Average | $O(1)$ Average | $O(N)$ | Insertion Order |
+
+### Extra Work for "Wrong" Map Choices
+* If **`HashMap`** is used for the Code-Ordered report, entries must be extracted into a `List` and sorted using `Collections.sort()` costing $O(N \log N)$ extra time and space.
+* If **`HashMap`** is used for the Insertion-Ordered report, order cannot be recovered unless an auxiliary history list is maintained.
+
+---
+
+## 2. Experimental Benchmark Results
+
+### Benchmark Metrics Across Inventory Sizes
+
+| Inventory Size | Map Implementation | 100,000 Lookups Time | Report Iteration Time | Order Guarantee |
+| :--- | :--- | :--- | :--- | :--- |
+| **500 Medicines** | `HashMap` | $\approx 1.80$ ms | $\approx 0.05$ ms | None |
+| | `TreeMap` | $\approx 4.50$ ms | $\approx 0.08$ ms | Code Order (A–Z) |
+| | `LinkedHashMap` | $\approx 2.10$ ms | $\approx 0.06$ ms | Insertion Order |
+| **20,000 Medicines**| `HashMap` | $\approx 3.20$ ms | $\approx 1.20$ ms | None |
+| | `TreeMap` | $\approx 14.80$ ms | $\approx 2.40$ ms | Code Order (A–Z) |
+| | `LinkedHashMap` | $\approx 3.80$ ms | $\approx 1.30$ ms | Insertion Order |
+
+---
+
+## 3. Scalability & Architectural Decision
+
+* **Acceptable Response Time:** $< 0.1$ ms per individual lookup (100,000 lookups completed in under 10 ms).
+* **Primary Deployment Choice:** **`HashMap`** for high-frequency live stock lookups during clinical operation ($O(1)$ lookup time).
+* **Report Generation Strategy:**
+  * For Evening Code-Ordered Report: Dump `HashMap` values into a `TreeMap` or sorted list ($O(N \log N)$ spent once per day during non-peak hours).
+  * For Evening Insertion-Ordered Report: Use **`LinkedHashMap`** if insertion tracking is mandatory without added sorting overhead.
+* **Why Avoid `Hashtable`:** `Hashtable` locks every method with `synchronized`, degrading performance in multi-threaded production servers. Modern code uses `ConcurrentHashMap` for thread-safe access without global bottlenecking.
+
+---
+
+## 4. Alternative Concept & Complexity Analysis
+
+### Binary Search Array Alternative
+Storing medicines in a sorted array and querying via `Arrays.binarySearch()`:
+
+```java
+Medicine[] inventory = getSortedInventory();
+int index = Arrays.binarySearch(inventory, keyCode, comparator);

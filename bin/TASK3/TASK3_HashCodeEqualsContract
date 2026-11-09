@@ -1,0 +1,9 @@
+# Q3 – Engineer the hashCode–equals Contract
+
+---
+
+## 1. Experimental Results & Pre-Fix Investigation
+
+### Output Before Completing TODO 1 (Without `hashCode()` Override)
+```text
+Unique students: 3

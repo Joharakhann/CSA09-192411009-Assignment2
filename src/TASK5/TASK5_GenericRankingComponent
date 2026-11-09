@@ -1,0 +1,21 @@
+# Q5 – Derive a Generic Ranking Component from a Principle
+
+---
+
+## 1. Design Reasoning & Generics Principles
+
+### Comparator vs. Comparable Choice
+* **Decision:** We select separate `Comparator` objects over implementing `Comparable<Team>` directly on the class.
+* **Justification:** Hardcoding `Comparable<Team>` locks the `Team` class into one fixed sorting criteria. A `Comparator` approach enforces the **Open/Closed Principle (OCP)**, allowing alternate ranking strategies (e.g., Fair Play rank, Away goals) without altering domain classes.
+
+### Type Boundaries and Wildcards
+* `Comparator<? super T>`: Enables consumer supertype flexibilities. For instance, a `Comparator<Participant>` can sort `Leaderboard<Player>` or `Leaderboard<Team>`.
+* `List<? extends T>`: Allows safe read access when accepting sub-type collections into the generic leaderboard.
+
+---
+
+## 2. Experimental Verification & Results
+
+### Program Output
+```text
+[Eagles(9,6), Bisons(9,4), Panthers(9,4), Cobras(6,1)]

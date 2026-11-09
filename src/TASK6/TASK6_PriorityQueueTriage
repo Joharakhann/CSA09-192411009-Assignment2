@@ -1,0 +1,17 @@
+# Q6 – Priority, Order and Fairness in a Queue
+
+---
+
+## 1. Architectural Reasoning & Design Choices
+
+* **Why Plain Queues Fail:** A standard `LinkedList` or `ArrayDeque` enforces strict FIFO ordering regardless of severity. Critical patients (Severity 1) would be stuck behind minor cases (Severity 5) who arrived earlier.
+* **Preserving FIFO Order for Equal Severities:** Java's `PriorityQueue` is a min-heap structure that does not guarantee FIFO ordering among elements with equal priority values. To enforce arrival ordering, each `Patient` receives a monotonically increasing `arrival` sequence counter upon admission. The secondary key in the chained comparator breaks ties using `.thenComparingLong(p -> p.arrival)`.
+* **Why Printing `PriorityQueue` Directly Is Incorrect:** Printing a `PriorityQueue` invokes its `iterator()`, which outputs elements in array-heap storage order rather than fully sorted priority order. Iterating elements sequentially via `.poll()` is required to extract elements in true priority order.
+
+---
+
+## 2. Experimental Results & Verification
+
+### Program Output
+```text
+Treatment Order: Meena(S1) Kumar(S1) Lata(S2) Ravi(S3) John(S3) Asha(S5)
